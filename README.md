@@ -18,6 +18,37 @@ Now it doesn’t take much to realize that users are much more willing to use st
 
 If you are just looking for a compiled binary for Windows, you can download it at http://xato.net/pafwert
 
+Modern C++ CLI
+-------
+This repository also contains a cross-platform C++20 rewrite of the Pafwert command-line
+tool (the original VB6 sources remain under `Project/`). It uses the same pattern engine,
+`Wordlists/`, and `Patterns.cfg`.
+
+Build and install with CMake (3.21+):
+
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    cmake --build build
+    ctest --test-dir build       # optional smoke tests
+    sudo cmake --install build   # installs pafwert and the wordlists
+
+The wordlists and pattern list are installed to `<prefix>/share/pafwert/wordlists` and
+located at runtime via the XDG base directories: `$PAFWERT_WORDLIST_DIR`,
+`$XDG_DATA_HOME/pafwert/wordlists`, then each entry of `$XDG_DATA_DIRS`. You can also
+drop your own customized wordlists into `~/.local/share/pafwert/wordlists` to override
+the system-wide set. User configuration is read from
+`$XDG_CONFIG_HOME/pafwert/pafwert.conf` (`key = value`; keys: `wordlists`, `count`).
+
+    pafwert                  # generate 12 passwords
+    pafwert -n 5 -v          # 5 passwords, showing the pattern used
+    pafwert -p '{Word(adjective)} {Word(noun)+obscure}'   # a fixed pattern
+    pafwert -k 'ottawa hiking'                            # mix in your keywords
+    pafwert --check '{Word(noun)+propercase}{number(99)}' # validate a pattern
+
+Note: `Wordlists/Slurs.txt` is intentionally not installed (it exists to support the
+original GUI's password checker and a few "Slang" patterns); patterns that reference a
+missing wordlist are simply skipped. Some remaining wordlists still contain crude words —
+see the warning inside `Patterns.cfg`.
+
 About
 -------
 I began development on this tool as a Perl script in 2000. Over the years I have spent way too much time overthinking and overdeveloping something as simple as a password generator, but Pafwert is the result. If you would like to get a taste of how complex Pafwert really is under the surface, I suggest reading the Pattern Guide.
